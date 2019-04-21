@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>AJAX/GIPHY</title>
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0/css/bootstrap.min.css" />
+</head>
+
+<body>
+    <div class="container">
+        <h1>Fit & Funny</h1>
+
+        <!-- This form will be where users input data about the Gifs -->
+        <form id="gif-form">
+            <label for="gif-input">Search for a Gif</label>
+            <input type="text" id="gif-input"><br>
+
+            <!-- This button will trigger our AJAX call -->
+            <input id="find-gif" type="submit" value="Gif Search">
+        </form>
+    </div>
+
+    <div id="searchBtns"></div>
+
+    <!-- <button data-search="Yoga">Yoga</button>
+    <button data-search="Gymnastic">Gymnastics</button>
+    <button data-search="Swimming">Swimming</button>
+    <button data-search="BeerPong">BeerPong</button>
+    <button data-search="Racing">Racing</button>
+    <button data-search="Baseball">Baseball</button>
+    <button data-search="Basketball">Basketball</button>
+    <button data-search="Soccer">Soccer</button>
+    <button data-search="Football">Football</button>
+    <button data-search="Hockey">Hockey</button>
+    <button data-search="Ice_Skating">Ice Skating</button>
+    <button data-search="Karate">Karate</button>
+    <button data-search="Cheerleading">Cheerleading</button>
+    <button data-search="Surfing">Surfing</button>
+    <button data-search="BMX">BMX</button>
+    <button data-search="Snowboarding">Snowboarding</button> -->
+    <div id="gif_container">
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script type="text/javascript">
+
+        var searchTerms = ["Yoga","Soccer","Baseball","Basketball", "Football","Surfing","BMX","Snowboarding","Karate","Nascar","Ice Skating"];
+
+        createButtons();
+
+        function createButtons(){
+            $("#searchBtns").empty();
+            for(var i = 0; i < searchTerms.length; i++){
+                $("#searchBtns").append("<button data-search='" + searchTerms[i] + "'> " + searchTerms[i] +"</button>")
+            }
+        }
+
+
+        $('#find-gif').on('click', function (event) {
+            event.preventDefault()
+            var searchTerm = $("#gif-input").val();
+            searchTerms.push(searchTerm);
+            createButtons();
+
+
+            console.log(searchTerm)
+            searchGiphy(searchTerm);
+        })
+
+        $("button").on("click", function(){
+            searchGiphy($(this).attr("data-search"));
+        })
+
+        function searchGiphy(x) {
+            $("#gif_container").empty();
+            var queryURL = "https://api.giphy.com/v1/gifs/search?q=" + x + "&limit=10&api_key=ZZrF9saCY1Dz0BLZgbWdmLfFvLyVJOYH";
+            console.log(queryURL);
+        
+            $.ajax({
+                url: queryURL,
+                method: "GET"
+            })
+                .done(function (response) {
+                    console.log(response);
+                    for (var i = 0; i < response.data.length; i++) {
+                        var img = $("<img>");
+                        img.addClass("gif")
+                        //$('#gif_container').prepend("<img src='"+response.data[i].images.downsized.url+"'>");
+                        img.attr("src", response.data[i].images.downsized.url);
+                        img.attr("data-still-src", response.data[i].images.downsized_still.url)
+                        img.attr("data-animate-src", response.data[i].images.downsized.url)
+
+                        $('#gif_container').prepend("<p>Rating: " + response.data[i].rating + "</p>");
+                        $("#gif_container").prepend(img);
+                    }
+
+                })
+        }
+
+        $(document).on("click", ".gif", function () {
+            if ($(this).attr("data-animate-src") === $(this).attr("src")) {
+                $(this).attr("src", $(this).attr("data-still-src"))
+                console.log("Switch src to still src")
+            } else {
+                console.log("Switch src to animate-src")
+                $(this).attr("src", $(this).attr("data-animate-src"))
+            };
+
+            //   // The attr jQuery method allows us to get or set the value of any attribute on our HTML element
+            //   var state = $(this).attr("data-state");
+            //   // If the clicked image's state is still, update its src attribute to what its data-animate value is.
+            //   // Then, set the image's data-state to animate
+            //   // Else set src to the data-still value
+            //   if (state === "still") {
+            //     $(this).attr("src", $(this).attr("data-animate"));
+            //     $(this).attr("data-state", "animate");
+            //   } else {
+            //     $(this).attr("src", $(this).attr("data-still"));
+            //     $(this).attr("data-state", "still");
+            //   }
+        });
+    //this and data attributes are the main ideas behind this
+    </script>
+    </div>
+</body>
+
+</html>
